@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Shifting Glyphs Puzzle</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
+        h1 {
+            color: #ffcc00;
+        }
+        .puzzle-container {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            gap: 10px;
+            margin: 30px auto;
+            width: 320px;
+        }
+        .pillar {
+            width: 100px;
+            height: 100px;
+            border: 3px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, background-color 0.2s;
+        }
+        .pillar:hover {
+            transform: scale(1.1);
+        }
+        .stateA { background-color: #00ff00; } /* Green */
+        .stateB { background-color: #ff0000; } /* Red */
+        .stateC { background-color: #0000ff; } /* Blue */
+        .stateD { background-color: #ffcc00; } /* Yellow */
+        .stateE { background-color: #9900cc; } /* Purple */
+        .status {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #ffcc00;
+        }
+        .win-message {
+            display: none;
+            margin-top: 20px;
+            font-size: 24px;
+            color: #00ff00;
+            font-weight: bold;
+        }
+        .hint-button, .reset-button {
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 18px;
+            background-color: #222;
+            color: white;
+            border: 2px solid #ffcc00;
+            cursor: pointer;
+        }
+        .hint-button:hover, .reset-button:hover {
+            background-color: #444;
+        }
+        .failure-message {
+            display: none;
+            margin-top: 20px;
+            font-size: 24px;
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Advanced Shifting Glyphs Puzzle</h1>
+    <p>Click the glyphs to shift their states. Align all to green (State A) to solve the puzzle.</p>
+
+    <div class="puzzle-container">
+        <div class="pillar stateA" id="pillar1" onclick="changeState(1)">A</div>
+        <div class="pillar stateB" id="pillar2" onclick="changeState(2)">B</div>
+        <div class="pillar stateC" id="pillar3" onclick="changeState(3)">C</div>
+        <div class="pillar stateD" id="pillar4" onclick="changeState(4)">D</div>
+        <div class="pillar stateE" id="pillar5" onclick="changeState(5)">E</div>
+        <div class="pillar stateA" id="pillar6" onclick="changeState(6)">A</div>
+        <div class="pillar stateB" id="pillar7" onclick="changeState(7)">B</div>
+        <div class="pillar stateC" id="pillar8" onclick="changeState(8)">C</div>
+        <div class="pillar stateD" id="pillar9" onclick="changeState(9)">D</div>
+    </div>
+
+    <div class="status">Puzzle Active</div>
+    <button class="reset-button" onclick="resetPuzzle()">Reset Puzzle</button>
+
+    <div class="win-message">The glyphs align, you win!!!</div>
+    <div class="failure-message"></div>
+
+    <script>
+        let glyphStates = ["A", "B", "C", "D", "E"];  
+        let pillars = [
+            { id: 1, state: 0, affects: [1, 4, 7] },
+            { id: 2, state: 1, affects: [2, 5, 8] },
+            { id: 3, state: 2, affects: [3, 6, 9] },
+            { id: 4, state: 3, affects: [1, 5, 9] },
+            { id: 5, state: 4, affects: [2, 5, 8] },
+            { id: 6, state: 0, affects: [3, 6, 7] },
+            { id: 7, state: 1, affects: [4, 7, 8] },
+            { id: 8, state: 2, affects: [5, 8, 9] },
+            { id: 9, state: 3, affects: [6, 7, 9] }
+        ];
+        let moveCount = 0;
+
+        function changeState(pillarId) {
+            let pillar = pillars.find(p => p.id === pillarId);
+            pillar.state = (pillar.state + 1) % 5;
+            pillar.affects.forEach(id => {
+                let affected = pillars.find(p => p.id === id);
+                affected.state = (affected.state + 1) % 5;
+                updatePillar(affected);
+            });
+
+            updatePillar(pillar);
+            moveCount++;
+
+            if (moveCount >= 15) {
+                document.querySelector(".failure-message").style.display = "block";
+            }
+
+            checkWinCondition();
+        }
+
+        function updatePillar(pillar) {
+            let element = document.getElementById(`pillar${pillar.id}`);
+            element.textContent = glyphStates[pillar.state];
+            element.className = "pillar state" + glyphStates[pillar.state];
+        }
+
+        function checkWinCondition() {
+            if (pillars.every(p => p.state === 0)) {
+                document.querySelector(".win-message").style.display = "block";
+            }
+        }
+
+        function resetPuzzle() {
+            location.reload();
+        }
+    </script>
+
+</body>
+</html>
